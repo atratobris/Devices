@@ -1,7 +1,8 @@
-http://www.arduino.org/learning/tutorials/boards-tutorials/restserver-and-restclient
+https://create.arduino.cc/projecthub/Salman_faris_vp/webserverblink-using-arduino-uno-wifi-bd5c59
 
-Rest server and Client Tutorial
+Create a local web server and make an LED blink
 
-*Goal*
+## Results
 
-Connect an LED with one Arduino WiFi and a button with the other one and interact with them over WiFi.
+I have been able to setup the Uno WiFi with the network. The way to write code for it was still through the Arduino Cli which was a drawback. 
+
