@@ -2,50 +2,50 @@
 #include <ArduinoWiFi.h>
 /*
 on your borwser, you type http://<IP>/arduino/webserver/ or http://<hostname>.local/arduino/webserver/
- 
+
 http://www.arduino.org/learning/tutorials/webserverblink
- 
+
 */
 void setup() {
     pinMode(13,OUTPUT);
     Wifi.begin();
-    Wifi.println("WebServer Server is up"); 
+    Wifi.println("WebServer Server is up");
 }
 void loop() {
- 
+
     while(Wifi.available()){
       process(Wifi);
     }
   delay(50);
 }
- 
+
 void process(WifiData client) {
   // read the command
   String command = client.readStringUntil('/');
- 
+
   // is "digital" command?
   if (command == "webserver") {
     WebServer(client);
   }
- 
+
   if (command == "digital") {
     digitalCommand(client);
   }
 }
- 
+
 void WebServer(WifiData client) {
- 
+
   client.println("HTTP/1.1 200 OK");
   client.println("Content-Type: text/html");
   client.println();
   client.println("<html>");
-  
+
   client.println("<head> </head>");
   client.print("<body>");
   printPinValues(client);
   client.print("</body>");
   client.println("</html>");
-  client.print(DELIMITER); // very important to end the communication !!! 
+  client.print(DELIMITER); // very important to end the communication !!!
   client.flush();
 }
 
@@ -61,10 +61,10 @@ String printPinValues(WifiData client) {
 
 void digitalCommand(WifiData client) {
   int pin, value;
- 
+
   // Read pin number
   pin = client.parseInt();
- 
+
   // If the next character is a '/' it means we have an URL
   // with a value like: "/digital/13/1"
   if (client.read() == '/') {
