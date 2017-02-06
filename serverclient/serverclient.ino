@@ -42,20 +42,15 @@ void setup() {
   // (no one from the external network could connect)
   server.listenOnLocalhost();
   server.begin();
-  p.begin("python");
-  p.addParameter("/root/client.py");
-//  runPython();
+//  p.begin("python");
+//  p.addParameter("/root/client.py");
+  runPython();
 }
 
 void loop() {
   // Get clients coming from server
   YunClient client = server.accept();
-  while (!p.running()) {
-    runPython();
-    Serial.print("In here");
-    delay(1000);
-  }
-  Serial.println("hey babe");
+
   // There is a new client?
   if (client) {
     // Process request
@@ -69,8 +64,8 @@ void loop() {
 }
 
 void runPython(){
-  p.runAsynchronously();
-//  p.runShellCommandAsynchronously("");
+//  p.runAsynchronously();
+  p.runShellCommandAsynchronously("python /root/client.py");
   while (p.available()>0) {
     char c = p.read();
     Serial.print(c);
