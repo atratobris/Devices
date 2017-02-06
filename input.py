@@ -2,6 +2,8 @@ import logging
 import logging.handlers
 import traceback
 import time
+import os
+from socket import socket, AF_INET, SOCK_STREAM
 
 ###################### LIBRARIES ######################
 ################## COMPILED TOGETHER ##################
@@ -13,7 +15,10 @@ class SERIAL:
     END             = chr(31)
 
 class Logger:
-  file_name = '/root/YunMessenger.log'
+  if os.environ.get('USER') == 'root':
+    file_name = '/root/YunMessenger.log'
+  else:
+    file_name = './YunMessenger.log'
   logger = logging.getLogger(__name__)
   logger.setLevel(logging.DEBUG)
   handler = logging.handlers.RotatingFileHandler(file_name, maxBytes=524288, backupCount=0)
@@ -37,54 +42,53 @@ class Console(object):
     pass
 
     def __init__(self):
-        self.connected = False
-        self.msg_buffer = ""
-        self.logger = Logger.logger
-        self.logger.info("Logger initiated")
-        # Events
-        self.onMessage = Event()
+      self.connected = False
+      self.msg_buffer = ""
+      self.logger = Logger.logger
+      self.logger.info("Logger initiated")
+      self.onMessage = Event()
 
     def read(self):
-        if not self.connected: return None
-        index_end = -1
+      if not self.connected: return None
+      index_end = -1
 
-        try:
-            new_data = self.console.recv(1024)
-        except:
-            self.logger.error("Console.recv failed, closing connection")
-            self.logger.debug("Traceback: {traceback}".format(traceback=traceback.format_exc()))
-            self.console.close()
-            self.connected = False
-            return None
-        if new_data:
-            self.msg_buffer += new_data
-            index_end = self.msg_buffer.find(SERIAL.MSG.END)
+      try:
+          new_data = self.console.recv(1024)
+      except:
+          self.logger.error("Console.recv failed, closing connection")
+          self.logger.debug("Traceback: {traceback}".format(traceback=traceback.format_exc()))
+          self.console.close()
+          self.connected = False
+          return None
+      if new_data:
+          self.msg_buffer += new_data
+          index_end = self.msg_buffer.find(SERIAL.MSG.END)
 
-        if new_data == '':
-            # client closed the connection
-            self.logger.info("Socket connection closed")
-            self.console.close()
-            self.connected = False
-            return None
-        if index_end > 0:
-            index_name = self.msg_buffer.find(SERIAL.MSG.NAME)
-            index_msg = self.msg_buffer.find(SERIAL.MSG.DATA)
+      if new_data == '':
+          # client closed the connection
+          self.logger.info("Socket connection closed")
+          self.console.close()
+          self.connected = False
+          return None
+      if index_end > 0:
+          index_name = self.msg_buffer.find(SERIAL.MSG.NAME)
+          index_msg = self.msg_buffer.find(SERIAL.MSG.DATA)
 
-            publish_route = ""
-            msg = ""
+          publish_route = ""
+          msg = ""
 
-            if index_name >= 0 and index_msg > index_name:
-                publish_route = self.msg_buffer[(index_name + 1):index_msg]
-                msg = self.msg_buffer[(index_msg + 1):index_end]
-                try:
-                    self.onMessage(publish_route, msg)
-                except Exception:
-                    self.logger.error("Publishing the following message "\
-                                "to subscriber \"{subscriber}\" failed:\n{message}"\
-                                .format(subscriber=publish_route, message=msg))
-                    self.logger.debug("Traceback: \n{traceback}".format(traceback=traceback.format_exc()))
+          if index_name >= 0 and index_msg > index_name:
+              publish_route = self.msg_buffer[(index_name + 1):index_msg]
+              msg = self.msg_buffer[(index_msg + 1):index_end]
+              try:
+                  self.onMessage(publish_route, msg)
+              except Exception:
+                  self.logger.error("Publishing the following message "\
+                              "to subscriber \"{subscriber}\" failed:\n{message}"\
+                              .format(subscriber=publish_route, message=msg))
+                  self.logger.debug("Traceback: \n{traceback}".format(traceback=traceback.format_exc()))
 
-            self.msg_buffer = ""
+          self.msg_buffer = ""
 
     def run(self):
         self.logger.info("Run initiated")
@@ -113,7 +117,7 @@ class Console(object):
 ######################### OUR CODE ########################
 
 url  = 'http://captest.ngrok.io/api/board.json'
-console = Console.Console()
+console = Console()
 
 def button_handler(msg):
     print 'Button Handler received %s..' % msg

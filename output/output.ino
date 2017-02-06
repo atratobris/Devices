@@ -38,12 +38,8 @@ void setup() {
   Bridge.begin();
   digitalWrite(13, HIGH);
 
-  // Listen for incoming connection only from localhost
-  // (no one from the external network could connect)
   server.listenOnLocalhost();
   server.begin();
-//  p.begin("python");
-//  p.addParameter("/root/output.py");
   runPython();
 }
 
