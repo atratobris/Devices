@@ -121,7 +121,7 @@ console = Console()
 
 def button_handler(msg):
     print 'Button Handler received %s..' % msg
-    os.system("curl -X POST -d mac='B4:21:8A:F8:2E:23' -d button=True" + url)
+    os.system("curl -X POST -d mac='B4:21:8A:F8:2E:23' -d button=True " + url)
 
 if __name__ == '__main__':
   console.onMessage['button_pressed'] = button_handler
