@@ -13,12 +13,14 @@ void setup() {
   Bridge.begin();
   delay(2000);
   Console.begin();
+  runPython();
+  Serial.print("hey");
+  blinkTwice();  
   while (!Console) {
     ; // wait for Console port to connect.
   }
-  blinkTwice();
   Console.buffer(64);
-  runPython();
+
 }
 
 void loop() {
@@ -42,6 +44,7 @@ void runPython(){
 
 void blinkTwice() {
   for (int i = 0; i < 2; i++) {
+    delay(500);
     digitalWrite(13, LOW);
     delay(500);
     digitalWrite(13, HIGH);
