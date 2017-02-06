@@ -43,7 +43,7 @@ void setup() {
   server.listenOnLocalhost();
   server.begin();
 //  p.begin("python");
-//  p.addParameter("/root/client.py");
+//  p.addParameter("/root/output.py");
   runPython();
 }
 
@@ -65,7 +65,7 @@ void loop() {
 
 void runPython(){
 //  p.runAsynchronously();
-  p.runShellCommandAsynchronously("python /root/client.py");
+  p.runShellCommandAsynchronously("python /root/output.py");
   while (p.available()>0) {
     char c = p.read();
     Serial.print(c);
