@@ -23,12 +23,12 @@
 */
 #include <Process.h>
 #include <Bridge.h>
-#include <BridgeServer.h>
-#include <BridgeClient.h>
+#include <YunServer.h>
+#include <YunClient.h>
 
 // Listen to the default port 5555, the YÃºn webserver
 // will forward there all the HTTP requests you send
-BridgeServer server;
+YunServer server;
 Process p;
 
 void setup() {
@@ -49,7 +49,7 @@ void setup() {
 
 void loop() {
   // Get clients coming from server
-  BridgeClient client = server.accept();
+  YunClient client = server.accept();
   while (!p.running()) {
     runPython();
     Serial.print("In here");
@@ -80,7 +80,7 @@ void runPython(){
  Serial.flush();
 }
 
-void process(BridgeClient client) {
+void process(YunClient client) {
   // read the command
   String command = client.readStringUntil('/');
 
@@ -100,7 +100,7 @@ void process(BridgeClient client) {
   }
 }
 
-void digitalCommand(BridgeClient client) {
+void digitalCommand(YunClient client) {
   int pin, value;
 
   // Read pin number
@@ -127,7 +127,7 @@ void digitalCommand(BridgeClient client) {
   Bridge.put(key, String(value));
 }
 
-void analogCommand(BridgeClient client) {
+void analogCommand(YunClient client) {
   int pin, value;
 
   // Read pin number
@@ -167,7 +167,7 @@ void analogCommand(BridgeClient client) {
   }
 }
 
-void modeCommand(BridgeClient client) {
+void modeCommand(YunClient client) {
   int pin;
 
   // Read pin number
