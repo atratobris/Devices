@@ -23,12 +23,12 @@
 */
 #include <Process.h>
 #include <Bridge.h>
-#include <BridgeServer.h>
-#include <BridgeClient.h>
+#include <YunServer.h>
+#include <YunClient.h>
 
 // Listen to the default port 5555, the YÃºn webserver
 // will forward there all the HTTP requests you send
-BridgeServer server;
+YunServer server;
 Process p;
 
 void setup() {
@@ -42,20 +42,15 @@ void setup() {
   // (no one from the external network could connect)
   server.listenOnLocalhost();
   server.begin();
-  p.begin("python");
-  p.addParameter("/root/client.py");
-//  runPython();
+//  p.begin("python");
+//  p.addParameter("/root/client.py");
+  runPython();
 }
 
 void loop() {
   // Get clients coming from server
-  BridgeClient client = server.accept();
-  while (!p.running()) {
-    runPython();
-    Serial.print("In here");
-    delay(1000);
-  }
-  Serial.println("hey babe");
+  YunClient client = server.accept();
+
   // There is a new client?
   if (client) {
     // Process request
@@ -69,8 +64,8 @@ void loop() {
 }
 
 void runPython(){
-  p.runAsynchronously();
-//  p.runShellCommandAsynchronously("");
+//  p.runAsynchronously();
+  p.runShellCommandAsynchronously("python /root/client.py");
   while (p.available()>0) {
     char c = p.read();
     Serial.print(c);
@@ -80,7 +75,7 @@ void runPython(){
  Serial.flush();
 }
 
-void process(BridgeClient client) {
+void process(YunClient client) {
   // read the command
   String command = client.readStringUntil('/');
 
@@ -100,7 +95,7 @@ void process(BridgeClient client) {
   }
 }
 
-void digitalCommand(BridgeClient client) {
+void digitalCommand(YunClient client) {
   int pin, value;
 
   // Read pin number
@@ -127,7 +122,7 @@ void digitalCommand(BridgeClient client) {
   Bridge.put(key, String(value));
 }
 
-void analogCommand(BridgeClient client) {
+void analogCommand(YunClient client) {
   int pin, value;
 
   // Read pin number
@@ -167,7 +162,7 @@ void analogCommand(BridgeClient client) {
   }
 }
 
-void modeCommand(BridgeClient client) {
+void modeCommand(YunClient client) {
   int pin;
 
   // Read pin number

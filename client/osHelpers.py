@@ -18,7 +18,7 @@ def getMacAddress():
     wlanInfo = getWlanInfo()
     if wlanInfo == "Error":
         return
-    else:
+    elif wlanInfo:
         regex = ".*HWaddr (.*)"
         lines = wlanInfo.split("\n")
         for line in lines:
@@ -43,7 +43,7 @@ def getIpAddress():
     wlanInfo = getWlanInfo()
     if wlanInfo == "Error":
         return
-    else:
+    elif wlanInfo:
         regex = ".*inet addr:(.*)  Bcast.*"
         lines = wlanInfo.split("\n")
         for line in lines:

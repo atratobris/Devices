@@ -60,3 +60,4 @@ if __name__ == "__main__":
     print "MAC:", mac
     while True:
         communicate(ip, mac)
+        break
