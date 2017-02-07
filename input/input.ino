@@ -13,7 +13,7 @@ void setup() {
   Bridge.begin();
   delay(2000);
   Console.begin();
-  runPython();
+//  runPython();
   Serial.print("hey");
   blinkTwice();
   while (!Console) {
@@ -27,7 +27,7 @@ void loop() {
   buttonState = digitalRead(2);
   if (buttonState == HIGH) {
     m.send("button_pressed", "true");
-    delay(1000);
+    delay(500);
   }
 }
 

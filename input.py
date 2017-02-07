@@ -116,13 +116,21 @@ class Console(object):
 ###################### END LIBRARIES ######################
 ######################### OUR CODE ########################
 
-url  = 'http://captest.ngrok.io/api/board.json'
+url  = 'http://caplatform.herokuapp.com/api/board.json'
 console = Console()
+ledOn = False
 
 def button_handler(msg):
+    global ledOn
     print 'Button Handler received %s..' % msg
-    os.system("curl -X POST -d mac='B4:21:8A:F8:2E:23' -d button=True " + url)
+    if not ledOn:
+        os.system("curl -X POST -d mac='B4:21:8A:F8:2E:23' -d button=True " + url)
+        ledOn = not ledOn
+    else:
+        os.system("curl -X POST -d mac='B4:21:8A:F8:2E:23' -d button=False " + url)
+        ledOn = not ledOn
 
 if __name__ == '__main__':
   console.onMessage['button_pressed'] = button_handler
   console.run()
+  # button_handler("whateever")
