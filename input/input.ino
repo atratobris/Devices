@@ -15,7 +15,7 @@ void setup() {
   Console.begin();
   runPython();
   Serial.print("hey");
-  blinkTwice();  
+  blinkTwice();
   while (!Console) {
     ; // wait for Console port to connect.
   }
@@ -48,5 +48,5 @@ void blinkTwice() {
     digitalWrite(13, LOW);
     delay(500);
     digitalWrite(13, HIGH);
-  } 
+  }
 }
