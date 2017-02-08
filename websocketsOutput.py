@@ -1,10 +1,25 @@
-import websocket
+#!/usr/bin/python
+
 import thread
 import time
-import json
+import json, sys
+
+
+sys.path.insert(0, '/usr/lib/python2.7/websocket')
+sys.path.insert(0, '/usr/lib/python2.7/bridge')
+from bridgeclient import BridgeClient as bridgeclient
+import websocket
+
+b_client = bridgeclient()
+
+# value: 0 or 1
+# pin: integer
+# cl: bridgeclient instance
+def setPin(cl, pin, value):
+    cl.put('D'+str(pin), str(int(value)))
 
 def set_web_socket(url):
-    websocket.enableTrace(True)
+    # websocket.enableTrace(True)
     ws = websocket.WebSocketApp( url,
                                 on_message = on_message,
                                 on_error  = on_error,
@@ -13,6 +28,7 @@ def set_web_socket(url):
     return ws
 
 def on_message(ws, message):
+    global b_client
     # transform string to json
     message = json.loads(message)
 
@@ -21,6 +37,8 @@ def on_message(ws, message):
         identifier = json.loads(message["identifier"])
         data = message["message"]
         print "{} from {}".format( data["message"], identifier["channel"])
+        pin_status = bool(data["message"])
+        setPin(b_client, 13, bool(pin_status))
         return
 
     # get type of message
@@ -49,11 +67,11 @@ def on_close(ws):
 def on_open(ws):
     def run(*args):
         identifier = {
-            "channel":"RoomChannel"
+            "channel":"SketchChannel"
         }
         data = {
             "message":"mama",
-            "action":"speak"
+            "action":"blink"
         }
         message = {
             "command": "message",
@@ -71,5 +89,6 @@ def on_open(ws):
     thread.start_new_thread(run, ())
 
 if __name__ == "__main__":
-    ws = set_web_socket("ws://localhost:3000/cable")
+    ws = set_web_socket("ws://caplatform.herokuapp.com/cable")
+    # ws = set_web_socket("ws://localhost:3000/cable")
     ws.run_forever()
