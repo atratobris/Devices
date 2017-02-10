@@ -28,6 +28,8 @@ def set_web_socket(url):
     return ws
 
 def on_message(ws, message):
+    print message
+    return
     global b_client
     # transform string to json
     message = json.loads(message)
