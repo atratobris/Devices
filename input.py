@@ -1,10 +1,14 @@
+#!/usr/bin/python
 import logging
 import logging.handlers
 import traceback
 import time
 import os
 from socket import socket, AF_INET, SOCK_STREAM
+import json, sys
 
+sys.path.insert(0, '/usr/lib/python2.7/websocket')
+import websocket
 ###################### LIBRARIES ######################
 ################## COMPILED TOGETHER ##################
 
@@ -121,16 +125,52 @@ console = Console()
 ledOn = False
 
 def button_handler(msg):
+    global ws
     global ledOn
     print 'Button Handler received %s..' % msg
     if not ledOn:
         os.system("curl -X POST -d mac='B4:21:8A:F8:2E:23' -d button=True " + url)
         ledOn = not ledOn
+        button = True
     else:
         os.system("curl -X POST -d mac='B4:21:8A:F8:2E:23' -d button=False " + url)
         ledOn = not ledOn
+        button = False
+    ws.send(ws_message(button, "SketchChannel"))
+
+
+def greetings(channel_name):
+    identifier = {
+        "channel":channel_name
+    }
+    regards = {
+        "command": "subscribe",
+        "identifier": json.dumps(identifier)
+    }
+    return json.dumps(regards)
+
+
+
+def ws_message(data_input, channel_name):
+    identifier = {
+        "channel":channel_name
+    }
+    data = {
+        "message": data_input,
+        "action": "blink"
+    }
+    message = {
+        "command": "message",
+        "identifier":json.dumps(identifier),
+        "data": json.dumps(data)
+    }
+    return json.dumps(message)
 
 if __name__ == '__main__':
+  global ws
+  ws = websocket.create_connection("ws://caplatform.herokuapp.com/cable")
+  ws.send(greetings("SketchChannel"))
+  time.sleep(1)
+
   console.onMessage['button_pressed'] = button_handler
   console.run()
-  # button_handler("whateever")
