@@ -165,15 +165,12 @@ class Console(object):
 ###################### END LIBRARIES ######################
 ######################### OUR CODE ########################
 
-url  = 'http://caplatform.herokuapp.com/api/board.json'
-console = Console()
-ledOn = False
+CHANNEL = "SketchChannel"
 
 def button_handler(msg):
     global ws
-    global ledOn
     print 'Button Handler received %s..' % msg
-    ws.send(ws_message(True, "SketchChannel"))
+    ws.send(ws_message(True, CHANNEL))
 
 
 def greetings(channel_name):
@@ -211,15 +208,16 @@ if __name__ == '__main__':
   else:
     ws_url = "ws://localhost:3000/cable"
   ws = websocket.create_connection(ws_url)
-  ws.send(greetings("SketchChannel"))
+  ws.send(greetings(CHANNEL))
   time.sleep(1)
 
   if Config.embedded():
+    console = Console()
     console.onMessage['button_pressed'] = button_handler
     console.run()
   else:
     idx = 0
-    while idx < 100:
+    while idx < 1:
       button_handler("Blah")
       time.sleep(1)
       idx += 1
