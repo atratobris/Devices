@@ -37,7 +37,7 @@ void setup() {
 
 void loop() {
 
- Bridge.get("D13", D13value, 255);
+ Bridge.get("LCD", D13value, 255);
  if ( 0 != strncmp(D13value, D13valueOld, 255)) {
   memcpy(D13valueOld, D13value, 255);
   test_ptr = D13value;
