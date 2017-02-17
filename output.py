@@ -64,6 +64,9 @@ if Config.embedded():
 def setPin(cl, pin, value):
     cl.put('D'+str(pin), str(int(value)))
 
+def setString(cl, value):
+    cl.put('LCD', value)
+
 def set_web_socket(url):
     # websocket.enableTrace(True)
     ws = websocket.WebSocketApp( url,
@@ -83,9 +86,13 @@ def on_message(ws, message):
         identifier = json.loads(message["identifier"])
         data = message["message"]
         print "{} from {}".format( data["message"], identifier["channel"])
-        pin_status = bool(data["message"])
+        # pin_status = bool(data["message"])
         if Config.embedded():
-            setPin(b_client, 13, bool(pin_status))
+            m_data = data["message"]
+            if m_data["type"] == "lcd_display":
+                setString(b_client, m_data["value"])
+            else:
+                setPin(b_client, 13, bool(pin_status))
         return
 
     # get type of message
