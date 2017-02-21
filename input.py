@@ -22,7 +22,7 @@ class Config(object):
     @classmethod
     def getMac(cls):
         if cls.mac == None:
-            cls.mac = cls.getMacAddress()
+            cls.mac = cls.getMacAddress().strip()
         if cls.getOs() == 'darwin':
             return DEFAULT_MAC
         else:
@@ -76,6 +76,7 @@ def button_handler(msg):
 
 
 def greetings(channel_name):
+    print "MAC: %s" % Config.getMac()
     identifier = {
       "channel": channel_name,
       "mac": Config.getMac()
@@ -111,7 +112,7 @@ def ws_message(data_input, channel_name):
 
 if __name__ == '__main__':
   if Config.embedded():
-    ws_url = "ws://caplatform.herokuapp.com/cable"
+    ws_url = "ws://captest.ngrok.io/cable"
   else:
     ws_url = "ws://localhost:3000/cable"
   ws = websocket.create_connection(ws_url)
