@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import sys
+
 sys.path.insert(0, '/usr/lib/python2.7/websocket')
 sys.path.insert(0, '/usr/lib/python2.7/bridge')
 import thread, time, json, os, websocket, commands, re
@@ -20,7 +21,7 @@ class Config(object):
     @classmethod
     def getMac(cls):
         if cls.mac == None:
-            cls.mac = cls.getMacAddress()
+            cls.mac = cls.getMacAddress().strip()
         if cls.getOs() == 'darwin':
             return DEFAULT_MAC
         else:
@@ -87,12 +88,14 @@ def on_message(ws, message):
         data = message["message"]
         print "{} from {}".format( data["message"], identifier["channel"])
         # pin_status = bool(data["message"])
+        m_data = data["message"]
         if Config.embedded():
-            m_data = data["message"]
             if m_data["type"] == "lcd_display":
                 setString(b_client, m_data["value"])
+            elif m_data["type"] == "led":
+                setPin(b_client, 13, m_data["13"])
             else:
-                setPin(b_client, 13, bool(pin_status))
+                print "Nothing to do for type: %s" % m_data["type"]
         return
 
     # get type of message
@@ -119,6 +122,7 @@ def on_close(ws):
     print "### closed ###"
 
 def on_open(ws):
+    print "Registering device %s for SketchChannel" % Config.getMac()
     def run(*args):
         identifier = {
             "channel":"SketchChannel",
