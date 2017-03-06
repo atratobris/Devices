@@ -70,9 +70,9 @@ if Config.embedded():
 CHANNEL = "SketchChannel"
 
 if Config.embedded():
-  url = "ws://caplatform.herokuapp.com/cable"
+  url = "caplatform.herokuapp.com"
 else:
-  url = "ws://localhost:3000/cable"
+  url = "localhost:3000"
 ws = None
 
 def button_handler(msg):
@@ -132,6 +132,7 @@ def setup_connection(url):
         raise e
 
 if __name__ == '__main__':
+  print url
   setup_connection(url)
   ws.send(greetings(CHANNEL))
   time.sleep(1)
