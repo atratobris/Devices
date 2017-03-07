@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import sys
+
 sys.path.insert(0, '/usr/lib/python2.7/websocket')
 import thread, time, json, websocket
 b_client = None
