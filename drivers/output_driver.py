@@ -18,7 +18,12 @@ class Driver(DriverInterface):
     return ( response and response == 'true' )
 
   def set(self, data):
-    b_client.put("OUTPUT_CHANNEL", str(int(data)))
+    if m_data["type"] == "lcd_display":
+      b_client.put("LCD", data['value'])
+    elif m_data["type"] == "led":
+      b_client.put("D13", str(int(bool(data['value']))))
+    else:
+      pass
 
 
 # LED
