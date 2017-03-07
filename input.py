@@ -1,76 +1,25 @@
 #!/usr/bin/python
-import time, os, json, sys, commands, re
+import time, json, sys, thread
 
 sys.path.insert(0, '/usr/lib/python2.7/websocket')
 sys.path.insert(0, '/usr/lib/python2.7/bridge')
 import websocket
-###################### LIBRARIES ######################
-################## COMPILED TOGETHER ##################
-
-DEFAULT_MAC = "1234"
-
-class Config(object):
-    user = os.environ.get('USER')
-    operating_system = sys.platform
-    mac = None
-    @classmethod
-    def embedded(cls):
-        return cls.user == "root"
-    @classmethod
-    def getOs(cls):
-        return cls.operating_system
-    @classmethod
-    def getMac(cls):
-        if cls.mac == None:
-            cls.mac = cls.getMacAddress().strip()
-        if cls.getOs() == 'darwin':
-            return DEFAULT_MAC
-        else:
-            return cls.mac
-    @classmethod
-    def getMacAddress(cls):
-        wlanInfo = cls.getWlanInfo()
-        if wlanInfo == "Error":
-            return
-        elif wlanInfo:
-            regex = ".*HWaddr (.*)"
-            lines = wlanInfo.split("\n")
-            for line in lines:
-                matched = re.match(regex, line)
-                if matched:
-                    return matched.group(1)
-        return ""
-    @classmethod
-    def getWlanInfo(cls):
-        status, output = commands.getstatusoutput("ifconfig")
-        if status == 0:
-            for connection in output.split("\n\n"):
-                if cls.checkIfWlan(connection):
-                    return connection
-        else:
-            return "Error"
-    @classmethod
-    def checkIfWlan(cls, text):
-        regex = "wlan0.*"
-        matched = re.match(regex, str(text))
-        if matched:
-            return True
-        return False
+from board_setup import BoardSetup
+from config import Config
 
 if Config.embedded():
-    from bridgeclient import BridgeClient as bridgeclient
-    b_client = bridgeclient()
-
-
-###################### END LIBRARIES ######################
-######################### OUR CODE ########################
+  from input_driver import Driver as Driver
+else:
+  from test_driver import TestInputDriver as Driver
 
 
 CHANNEL = "SketchChannel"
+driver = Driver()
 
 
-def button_handler(msg):
-    global ws
+def button_handler(msg, ws=None):
+    if not ws:
+      return
     print 'Button Handler received %s..' % msg
     ws.send(ws_message(True, CHANNEL))
 
@@ -86,13 +35,6 @@ def greetings(channel_name):
       "identifier": json.dumps(identifier)
     }
     return json.dumps(regards)
-
-def run():
-  while True:
-    response = b_client.get("BP")
-    if (response and response == 'true'):
-      b_client.put("BP", "false")
-      button_handler(response)
 
 def ws_message(data_input, channel_name):
     identifier = {
@@ -110,20 +52,57 @@ def ws_message(data_input, channel_name):
     }
     return json.dumps(message)
 
+def greet(ws):
+  ws.send(greetings(CHANNEL))
+
+def on_open(ws, is_registered, is_pending, register_callback):
+  def run(*args):
+    while not is_registered():
+      if is_pending():
+        print 'Pending'
+        driver.register_pending()
+        registered_pressed = driver.read_register_status()
+        if registered_pressed:
+          register_callback()
+      else:
+        print 'Unregistered'
+        time.sleep(2)
+    print 'Registered'
+    greet(ws)
+    while True:
+      response = driver.get()
+      if response:
+        driver.reset()
+        button_handler(response, ws)
+      time.sleep(60)
+  thread.start_new_thread(run, ())
+
+
 if __name__ == '__main__':
+
   if Config.embedded():
     ws_url = "ws://captest.ngrok.io/cable"
   else:
     ws_url = "ws://localhost:3000/cable"
-  ws = websocket.create_connection(ws_url)
-  ws.send(greetings(CHANNEL))
-  time.sleep(1)
+
+  b_setup = BoardSetup(ws_url, Config.getMac())
+  b_setup.set(on_open_callback=on_open)
 
   if Config.embedded():
-    run()
+    while True:
+      try:
+        b_setup.run_forever()
+        time.sleep(5)
+      except:
+        pass
   else:
-    idx = 0
+    idx = 0;
+    # Don't try to restart server
     while idx < 1:
-      button_handler("Blah")
-      time.sleep(1)
+      try:
+        b_setup.run_forever()
+        time.sleep(1)
+      except:
+        pass
       idx += 1
+
