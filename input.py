@@ -4,6 +4,7 @@ import time, os, json, sys, commands, re
 sys.path.insert(0, '/usr/lib/python2.7/websocket')
 sys.path.insert(0, '/usr/lib/python2.7/bridge')
 import websocket
+from socket import gaierror
 ###################### LIBRARIES ######################
 ################## COMPILED TOGETHER ##################
 
@@ -68,6 +69,11 @@ if Config.embedded():
 
 CHANNEL = "SketchChannel"
 
+if Config.embedded():
+  url = "caplatform.herokuapp.com"
+else:
+  url = "localhost:3000"
+ws = None
 
 def button_handler(msg):
     global ws
@@ -76,16 +82,16 @@ def button_handler(msg):
 
 
 def greetings(channel_name):
-    print "MAC: %s" % Config.getMac()
-    identifier = {
-      "channel": channel_name,
-      "mac": Config.getMac()
-    }
-    regards = {
-      "command": "subscribe",
-      "identifier": json.dumps(identifier)
-    }
-    return json.dumps(regards)
+  print "Registering device %s for SketchChannel" % Config.getMac()
+  identifier = {
+    "channel": channel_name,
+    "mac": Config.getMac()
+  }
+  regards = {
+    "command": "subscribe",
+    "identifier": json.dumps(identifier)
+  }
+  return json.dumps(regards)
 
 def run():
   while True:
@@ -110,12 +116,24 @@ def ws_message(data_input, channel_name):
     }
     return json.dumps(message)
 
+def setup_connection(url):
+  global ws
+  timeout = 1
+  retry_count = 10
+  for i in xrange(retry_count):
+    try:
+      ws = websocket.create_connection("ws://%s/cable" % url)
+    except gaierror as e:
+      print "Input for %s failed %s. Retry: %d timeout: %d" % (Config.getMac(), str(e), i, timeout)
+      if i < retry_count:
+        time.sleep(timeout)
+        timeout *= 2
+      else:
+        raise e
+
 if __name__ == '__main__':
-  if Config.embedded():
-    ws_url = "ws://captest.ngrok.io/cable"
-  else:
-    ws_url = "ws://localhost:3000/cable"
-  ws = websocket.create_connection(ws_url)
+  print url
+  setup_connection(url)
   ws.send(greetings(CHANNEL))
   time.sleep(1)
 
@@ -124,6 +142,6 @@ if __name__ == '__main__':
   else:
     idx = 0
     while idx < 1:
-      button_handler("Blah")
+      button_handler("true")
       time.sleep(1)
       idx += 1
