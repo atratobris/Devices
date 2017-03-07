@@ -5,6 +5,8 @@ sys.path.insert(0, '/usr/lib/python2.7/websocket')
 import thread, time, json, websocket
 b_client = None
 
+sys.path.insert(0, 'setup/')
+
 from board_setup import BoardSetup
 from config import Config
 
@@ -101,24 +103,5 @@ if __name__ == "__main__":
     
   b_setup = BoardSetup(ws_url, DEFAULT_MAC)
   b_setup.set(on_open_callback=on_open, on_sketch_message=on_message)   
-  # if Config.embedded():
-  #   ws = set_web_socket("ws://caplatform.herokuapp.com/cable")
-  # else:
-  #   ws = set_web_socket("ws://localhost:3000/cable")
-  if Config.embedded():
-    while True:
-      try:
-        b_setup.run_forever()
-        time.sleep(5)
-      except:
-        pass
-  else:
-    idx = 0;
-    print "I'm here"
-    while idx < 1:
-      try:
-        b_setup.run_forever()
-        time.sleep(1)
-      except:
-        pass
-      idx += 1
+
+  b_setup.run_forever()

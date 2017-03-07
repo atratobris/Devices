@@ -1,6 +1,6 @@
 from driver_interface import DriverInterface
 
-import time
+import time, sys
 
 class TestInputDriver(DriverInterface):
   def __init__(self):
@@ -17,8 +17,11 @@ class TestInputDriver(DriverInterface):
     return False
 
   def get(self):
-    time.sleep(10)
+    # print "Sim the press of a button: "
+    # msg = sys.stdin.readline()
+    msg = raw_input("Sim the press of a button: ")
     return True
+
 
   def reset(self):
     pass
@@ -38,5 +41,5 @@ class TestOutputDriver(DriverInterface):
     return False
 
   def set(self, data):
-    pass
+    print data
 

@@ -1,4 +1,4 @@
-import sys, json
+import sys, json, time
 
 sys.path.insert(0, '/usr/lib/python2.7/websocket')
 sys.path.insert(0, '/usr/lib/python2.7/bridge')
@@ -7,6 +7,8 @@ import websocket
 
 SKETCH_CHANNEL = "SketchChannel"
 REGISTER_CHANNEL = "RegisterChannel"
+
+RETRY_LIMIT = 20
 
 class BoardSetup():
   def __init__(self, ws_url=None, mac=None):
@@ -22,6 +24,9 @@ class BoardSetup():
     self.registered = False
     self.pending = False
     self.mac = mac
+    self.retry_count = RETRY_LIMIT
+    self.current_retry = 1
+    self.timeout = 1
 
   def on_message(self, ws, message):
     message_object = json.loads(message)
@@ -71,6 +76,8 @@ class BoardSetup():
 
   def on_error(self, ws, error):
     print error
+    self.timeout *= 2
+    self.current_retry += 1
 
   def on_close(self, ws):
     print '## Closed ##'
@@ -78,6 +85,8 @@ class BoardSetup():
   def on_open(self, ws):
     print '## Opened ##'
     print 'Calling Greetings Fn'
+    self.timeout = 1
+    self.current_retry = 1
     ws.send(self.register_greeting())
     self.registered = False
     self.on_open_callback(ws, self.is_registered, self.is_pending, self.register_callback)
@@ -106,7 +115,12 @@ class BoardSetup():
     return self.pending
 
   def run_forever(self):
-    self.ws.run_forever()
+    while (self.current_retry < self.retry_count):
+      self.ws.run_forever()
+      time.sleep(self.timeout)
+      print "Sleeping for " + str(self.timeout)
+
+
 
   def register_callback(self):
     self.ws.send(self.register_message())

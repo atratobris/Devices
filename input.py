@@ -4,6 +4,10 @@ import time, json, sys, thread
 sys.path.insert(0, '/usr/lib/python2.7/websocket')
 sys.path.insert(0, '/usr/lib/python2.7/bridge')
 import websocket
+CHANNEL = "SketchChannel"
+
+sys.path.insert(0, 'setup/')
+sys.path.insert(0, 'drivers/')
 from board_setup import BoardSetup
 from config import Config
 
@@ -12,9 +16,8 @@ if Config.embedded():
 else:
   from test_driver import TestInputDriver as Driver
 
-
-CHANNEL = "SketchChannel"
 driver = Driver()
+
 
 
 def button_handler(msg, ws=None):
@@ -74,7 +77,6 @@ def on_open(ws, is_registered, is_pending, register_callback):
       if response:
         driver.reset()
         button_handler(response, ws)
-      time.sleep(60)
   thread.start_new_thread(run, ())
 
 
@@ -88,20 +90,22 @@ if __name__ == '__main__':
   b_setup = BoardSetup(ws_url, Config.getMac())
   b_setup.set(on_open_callback=on_open)
 
-  if Config.embedded():
-    while True:
-      try:
-        b_setup.run_forever()
-        time.sleep(5)
-      except:
-        pass
-  else:
-    idx = 0;
-    # Don't try to restart server
-    while idx < 1:
-      try:
-        b_setup.run_forever()
-        time.sleep(1)
-      except:
-        pass
-      idx += 1
+  b_setup.run_forever()
+
+  # if Config.embedded():
+  #   while True:
+  #     try:
+  #       b_setup.run_forever()
+  #       time.sleep(5)
+  #     except:
+  #       pass
+  # else:
+  #   idx = 0;
+  #   # Don't try to restart server
+  #   while idx < 3:
+  #     try:
+  #       b_setup.run_forever()
+  #       time.sleep(1)
+  #     except:
+  #       print "here"
+  #     idx += 1
