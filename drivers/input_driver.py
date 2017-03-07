@@ -13,7 +13,7 @@ class Driver(DriverInterface):
     b_client.put("pending", "true")
 
   def read_register_status(self):
-    response = b_client.get("register_confirmed")
+    response = b_client.get("BP")
     return ( response and response == 'true' )
 
   def get(self):

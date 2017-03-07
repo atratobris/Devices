@@ -1,6 +1,6 @@
 import os, sys, commands, re
 
-DEFAULT_MAC = "1234"
+DEFAULT_MAC = "12:34"
 
 class Config(object):
     user = os.environ.get('USER')

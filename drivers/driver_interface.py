@@ -13,3 +13,6 @@ class DriverInterface():
 
   def reset(self):
     raise NotImplementedError( "Should have implemented this" )
+
+  def set(self):
+    raise NotImplementedError( "Should have implemented this" )    
