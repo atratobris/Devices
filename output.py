@@ -18,7 +18,7 @@ else:
 CHANNEL = "SketchChannel"
 driver = Driver()
 
-DEFAULT_MAC = "5678"
+DEFAULT_MAC = "56:78"
 
 if Config.embedded():
     from bridgeclient import BridgeClient as bridgeclient
