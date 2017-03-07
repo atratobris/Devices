@@ -1,4 +1,4 @@
-import sys, json, time
+import sys, json, time, thread
 
 sys.path.insert(0, '/usr/lib/python2.7/websocket')
 sys.path.insert(0, '/usr/lib/python2.7/bridge')
@@ -11,10 +11,20 @@ REGISTER_CHANNEL = "RegisterChannel"
 RETRY_LIMIT = 20
 
 class BoardSetup():
-  def __init__(self, ws_url=None, mac=None):
+  def __init__(self, ws_url=None, mac=None, driver=None):
     if ws_url == None:
       return
     self.ws_url = ws_url
+    self.mac = mac
+    self.driver = driver
+
+    self.on_open = self._on_open
+    self.on_message = self._on_message
+    self.on_error = self._on_error
+    self.on_close = self._on_close
+    self.on_open_callback = self._on_open_callback
+    self.on_sketch_message = self._on_sketch_message
+    self.on_register_message = self._on_register_message
     websocket.enableTrace(False);
     self.ws = websocket.WebSocketApp(self.ws_url,
           on_message = self.on_message,
@@ -23,12 +33,11 @@ class BoardSetup():
           on_open = self.on_open)
     self.registered = False
     self.pending = False
-    self.mac = mac
     self.retry_count = RETRY_LIMIT
     self.current_retry = 1
     self.timeout = 1
 
-  def on_message(self, ws, message):
+  def _on_message(self, ws, message):
     message_object = json.loads(message)
     message_type = message_object.get("type", "unknown")
 
@@ -51,7 +60,7 @@ class BoardSetup():
       else:
         print message
 
-  def on_register_message(self, ws, message):
+  def _on_register_message(self, ws, message):
     message_object = message.get("message", {})
     message_type = message_object.get("type", "unknown")
     if message_type == "board_details":
@@ -71,38 +80,52 @@ class BoardSetup():
       print message
       pass
 
-  def on_sketch_message(self, ws, message):
+  def _on_sketch_message(self, ws, message):
     pass
 
-  def on_error(self, ws, error):
+  def _on_error(self, ws, error):
     print error
     self.timeout *= 2
     self.current_retry += 1
 
-  def on_close(self, ws):
+  def _on_close(self, ws):
     print '## Closed ##'
 
-  def on_open(self, ws):
+  def _on_open(self, ws):
+    def run(*args):
+      while not self.is_registered():
+        if self.is_pending():
+          print 'Pending'
+          self.driver.register_pending()
+          registered_pressed = self.driver.read_register_status()
+          if registered_pressed:
+            self.register_callback()
+        else:
+          print 'Unregistered'
+          time.sleep(2)
+      print 'Registered'
+      ws.send(self.greeting(SKETCH_CHANNEL))
+      self.on_open_callback(ws)
     print '## Opened ##'
     print 'Calling Greetings Fn'
     self.timeout = 1
     self.current_retry = 1
-    ws.send(self.register_greeting())
+    ws.send(self.greeting(REGISTER_CHANNEL))
     self.registered = False
-    self.on_open_callback(ws, self.is_registered, self.is_pending, self.register_callback)
+    thread.start_new_thread(run, ())
 
-  def on_open_callback(self, ws, is_registered, is_pending, register_callback):
+  def _on_open_callback(self, ws):
     pass
 
   def set(self, on_open=None, on_close=None, on_message=None, on_error=None, on_open_callback=None, on_sketch_message=None):
     if on_open:
-      self.ws.on_open = on_open
+      self.on_open = on_open
     if on_close:
-      self.ws.on_close = on_close
+      self.on_close = on_close
     if on_message:
-      self.ws.on_message = on_message
+      self.on_message = on_message
     if on_error:
-      self.ws.on_error = on_error
+      self.on_error = on_error
     if on_open_callback:
       self.on_open_callback = on_open_callback
     if on_sketch_message:
@@ -138,10 +161,10 @@ class BoardSetup():
     return json.dumps(message)
 
 
-  def register_greeting(self):
+  def greeting(self, channel_name):
     regards = {
       'command': 'subscribe',
-      'identifier': json.dumps(self.get_identifier(REGISTER_CHANNEL))
+      'identifier': json.dumps(self.get_identifier(channel_name))
     }
 
     return json.dumps(regards)

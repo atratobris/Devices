@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import time, json, sys, thread
+import time, json, sys
 
 sys.path.insert(0, '/usr/lib/python2.7/websocket')
 sys.path.insert(0, '/usr/lib/python2.7/bridge')
@@ -58,26 +58,12 @@ def ws_message(data_input, channel_name):
 def greet(ws):
   ws.send(greetings(CHANNEL))
 
-def on_open(ws, is_registered, is_pending, register_callback):
-  def run(*args):
-    while not is_registered():
-      if is_pending():
-        print 'Pending'
-        driver.register_pending()
-        registered_pressed = driver.read_register_status()
-        if registered_pressed:
-          register_callback()
-      else:
-        print 'Unregistered'
-        time.sleep(2)
-    print 'Registered'
-    greet(ws)
-    while True:
-      response = driver.get()
-      if response:
-        driver.reset()
-        button_handler(response, ws)
-  thread.start_new_thread(run, ())
+def on_open_callback(ws):
+  while True:
+    response = driver.get()
+    if response:
+      driver.reset()
+      button_handler(response, ws)
 
 
 if __name__ == '__main__':
@@ -87,25 +73,8 @@ if __name__ == '__main__':
   else:
     ws_url = "ws://localhost:3000/cable"
 
-  b_setup = BoardSetup(ws_url, Config.getMac())
-  b_setup.set(on_open_callback=on_open)
+  b_setup = BoardSetup(ws_url, Config.getMac(), driver)
+  b_setup.set(on_open_callback=on_open_callback)
 
   b_setup.run_forever()
 
-  # if Config.embedded():
-  #   while True:
-  #     try:
-  #       b_setup.run_forever()
-  #       time.sleep(5)
-  #     except:
-  #       pass
-  # else:
-  #   idx = 0;
-  #   # Don't try to restart server
-  #   while idx < 3:
-  #     try:
-  #       b_setup.run_forever()
-  #       time.sleep(1)
-  #     except:
-  #       print "here"
-  #     idx += 1
