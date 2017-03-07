@@ -6,7 +6,7 @@ sys.path.insert(0, '/usr/lib/python2.7/bridge')
 import thread, time, json, os, websocket, commands, re
 b_client = None
 
-DEFAULT_MAC = "1234"
+DEFAULT_MAC = "5678"
 
 class Config(object):
     user = os.environ.get('USER')
