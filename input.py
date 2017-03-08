@@ -65,14 +65,15 @@ def on_open_callback(ws):
 
 
 if __name__ == '__main__':
+  inputFile = open("deviceType.txt")
+  boardType = inputFile.readline().strip()
 
   if Config.embedded():
     ws_url = "ws://caplatform.herokuapp.com/cable"
   else:
     ws_url = "ws://localhost:3000/cable"
 
-  b_setup = BoardSetup(ws_url, Config.getMac(), driver)
+  b_setup = BoardSetup(ws_url, Config.getMac(), driver, boardType)
   b_setup.set(on_open_callback=on_open_callback)
 
   b_setup.run_forever()
-

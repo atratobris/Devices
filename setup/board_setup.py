@@ -10,12 +10,13 @@ REGISTER_CHANNEL = "RegisterChannel"
 RETRY_LIMIT = 20
 
 class BoardSetup():
-  def __init__(self, ws_url=None, mac=None, driver=None):
+  def __init__(self, ws_url=None, mac=None, driver=None, deviceType="Input"):
     if ws_url == None:
       return
     self.ws_url = ws_url
     self.mac = mac
     self.driver = driver
+    self.deviceType = deviceType
 
     self.on_open = self._on_open
     self.on_message = self._on_message
@@ -168,10 +169,11 @@ class BoardSetup():
     return json.dumps(regards)
 
   def get_identifier(self, channel_name):
-    return {
+    obj =  {
       'channel': channel_name,
       'mac': self.mac
     }
+    if channel_name == REGISTER_CHANNEL:
+        obj["type"] = self.deviceType
 
-
-
+    return obj
