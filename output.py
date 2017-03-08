@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import sys
+import sys, os
 
 sys.path.insert(0, '/usr/lib/python2.7/websocket')
 import time, json, websocket
