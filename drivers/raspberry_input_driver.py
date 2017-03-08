@@ -1,10 +1,8 @@
 import RPi.GPIO as GPIO
 
 import sys
-sys.path.insert(0, '/usr/lib/python2.7/bridge')
 
 from driver_interface import DriverInterface
-from bridgeclient import BridgeClient as bridgeclient
 
 
 class Driver(DriverInterface):
@@ -13,7 +11,7 @@ class Driver(DriverInterface):
     self.register_input = None
     self.buttonPin = 18
     self.registerPin = 20
-    GPIO.setMode(GPIO.BCM)
+    GPIO.setmode(GPIO.BCM)
     GPIO.setup(self.buttonPin, GPIO.IN)
     GPIO.setup(self.registerPin, GPIO.IN)
 

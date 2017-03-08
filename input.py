@@ -6,8 +6,8 @@ sys.path.insert(0, '/usr/lib/python2.7/bridge')
 import websocket
 CHANNEL = "SketchChannel"
 
-sys.path.insert(0, 'setup/')
-sys.path.insert(0, 'drivers/')
+sys.path.insert(0, '/home/root/atrato/setup/')
+sys.path.insert(0, '/home/root/atrato/drivers/')
 from board_setup import BoardSetup
 from config import Config
 
@@ -69,7 +69,7 @@ def on_open_callback(ws):
 if __name__ == '__main__':
 
   if Config.embedded():
-    ws_url = "ws://captest.ngrok.io/cable"
+    ws_url = "ws://caplatform.herokuapp.com/cable"
   else:
     ws_url = "ws://localhost:3000/cable"
 

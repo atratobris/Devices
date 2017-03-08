@@ -4,8 +4,8 @@ import sys
 sys.path.insert(0, '/usr/lib/python2.7/websocket')
 import time, json, websocket
 
-sys.path.insert(0, 'setup/')
-sys.path.insert(0, 'drivers/')
+sys.path.insert(0, '/home/root/atrato/setup/')
+sys.path.insert(0, '/home/root/atrato/drivers/')
 
 from board_setup import BoardSetup
 from config import Config
@@ -72,11 +72,13 @@ def greet(ws):
 
 if __name__ == "__main__":
   if Config.embedded():
-    ws_url = "ws://captest.ngrok.io/cable"
+    ws_url = "ws://caplatform.herokuapp.com/cable"
+    mac = Config.getMac()
   else:
     ws_url = "ws://localhost:3000/cable" 
+    mac = DEFAULT_MAC
     
-  b_setup = BoardSetup(ws_url, DEFAULT_MAC)
+  b_setup = BoardSetup(ws_url, mac)
   b_setup.set(on_sketch_message=on_sketch_message)   
 
   b_setup.run_forever()
