@@ -68,14 +68,16 @@ def greet(ws):
 
 
 if __name__ == "__main__":
+  inputFile = open("deviceType.txt")
+  boardType = inputFile.readline().strip()
   if Config.embedded():
     ws_url = "ws://caplatform.herokuapp.com/cable"
     mac = Config.getMac()
   else:
-    ws_url = "ws://localhost:3000/cable" 
+    ws_url = "ws://localhost:3000/cable"
     mac = DEFAULT_MAC
-    
-  b_setup = BoardSetup(ws_url, mac)
-  b_setup.set(on_sketch_message=on_sketch_message)   
+
+  b_setup = BoardSetup(ws_url, mac, driver, boardType)
+  b_setup.set(on_sketch_message=on_sketch_message)
 
   b_setup.run_forever()

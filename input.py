@@ -63,7 +63,6 @@ def on_open_callback(ws):
       driver.reset()
       button_handler(response, ws)
 
-
 if __name__ == '__main__':
   inputFile = open("deviceType.txt")
   boardType = inputFile.readline().strip()
