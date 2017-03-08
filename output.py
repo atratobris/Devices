@@ -68,7 +68,7 @@ def greet(ws):
 
 
 if __name__ == "__main__":
-  inputFile = open("deviceType.txt")
+  inputFile = open(os.path.join(os.path.dirname(__file__), 'deviceType.txt'))
   boardType = inputFile.readline().strip()
   if Config.embedded():
     ws_url = "ws://caplatform.herokuapp.com/cable"

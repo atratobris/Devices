@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import time, json, sys
+import time, json, sys, os
 
 sys.path.insert(0, '/usr/lib/python2.7/websocket')
 sys.path.insert(0, '/usr/lib/python2.7/bridge')
@@ -64,7 +64,8 @@ def on_open_callback(ws):
       button_handler(response, ws)
 
 if __name__ == '__main__':
-  inputFile = open("deviceType.txt")
+
+  inputFile = open(os.path.join(os.path.dirname(__file__), 'deviceType.txt'))
   boardType = inputFile.readline().strip()
 
   if Config.embedded():
