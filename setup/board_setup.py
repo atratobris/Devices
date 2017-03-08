@@ -1,7 +1,6 @@
 import sys, json, time, thread
 
 sys.path.insert(0, '/usr/lib/python2.7/websocket')
-sys.path.insert(0, '/usr/lib/python2.7/bridge')
 
 import websocket
 
@@ -25,7 +24,6 @@ class BoardSetup():
     self.on_open_callback = self._on_open_callback
     self.on_sketch_message = self._on_sketch_message
     self.on_register_message = self._on_register_message
-    websocket.enableTrace(False);
     self.ws = websocket.WebSocketApp(self.ws_url,
           on_message = self.on_message,
           on_error = self.on_error,
