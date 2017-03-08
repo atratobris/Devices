@@ -6,15 +6,13 @@ sys.path.insert(0, '/usr/lib/python2.7/bridge')
 import websocket
 CHANNEL = "SketchChannel"
 
-sys.path.insert(0, '/home/root/atrato/setup/')
-sys.path.insert(0, '/home/root/atrato/drivers/')
-from board_setup import BoardSetup
-from config import Config
+from setup.board_setup import BoardSetup
+from setup.config import Config
 
 if Config.embedded():
-  from input_driver import Driver as Driver
+  from drivers.input_driver import Driver as Driver
 else:
-  from test_driver import TestInputDriver as Driver
+  from drivers.test_driver import TestInputDriver as Driver
 
 driver = Driver()
 

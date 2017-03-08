@@ -4,16 +4,13 @@ import sys
 sys.path.insert(0, '/usr/lib/python2.7/websocket')
 import time, json, websocket
 
-sys.path.insert(0, '/home/root/atrato/setup/')
-sys.path.insert(0, '/home/root/atrato/drivers/')
-
-from board_setup import BoardSetup
-from config import Config
+from setup.board_setup import BoardSetup
+from setup.config import Config
 
 if Config.embedded():
-  from output_driver import Driver as Driver
+  from drivers.output_driver import Driver as Driver
 else:
-  from test_driver import TestOutputDriver as Driver
+  from drivers.test_driver import TestOutputDriver as Driver
 
 CHANNEL = "SketchChannel"
 driver = Driver()
