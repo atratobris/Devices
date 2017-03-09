@@ -25,6 +25,7 @@ class Driver(DriverInterface):
     GPIO.output(self.pendingPin, 1)
 
   def read_register_status(self):
+    return True
     button_pressed = self.get(self.registerPin)
     if button_pressed:
       GPIO.output(self.pendingPin, 0)
