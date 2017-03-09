@@ -30,6 +30,7 @@ class BoardSetup():
           on_error = self.on_error,
           on_close = self.on_close,
           on_open = self.on_open)
+    self.socket_opened = False
     self.registered = False
     self.pending = False
     self.retry_count = RETRY_LIMIT
@@ -76,7 +77,13 @@ class BoardSetup():
         self.pending = False
         self.registered = True
     elif message_type == "deregister_board":
-      self.ws.close()
+      self.pending = False
+      self.registered = False
+      self.socket_opened = False
+      ws.send(self.unsubscribe(REGISTER_CHANNEL))
+      ws.send(self.unsubscribe(SKETCH_CHANNEL))
+      print "Closing"
+      ws.close()
     else:
       print message
       pass
@@ -105,17 +112,22 @@ class BoardSetup():
           time.sleep(2)
       print 'Registered'
       ws.send(self.greeting(SKETCH_CHANNEL))
-      self.on_open_callback(ws)
+      self.on_open_callback(ws, self.check_socket_opened)
     print '## Opened ##'
     print 'Calling Greetings Fn'
     self.timeout = 1
     self.current_retry = 1
-    ws.send(self.greeting(REGISTER_CHANNEL))
     self.registered = False
+    self.socket_opened = True
+    ws.send(self.greeting(REGISTER_CHANNEL))
     thread.start_new_thread(run, ())
 
-  def _on_open_callback(self, ws):
+  def _on_open_callback(self, ws, check_socket_opened):
     pass
+
+  def check_socket_opened(self):
+    return self.socket_opened
+
 
   def set(self, on_open=None, on_close=None, on_message=None, on_error=None, on_open_callback=None, on_sketch_message=None):
     if on_open:
@@ -142,8 +154,14 @@ class BoardSetup():
       self.ws.run_forever()
       time.sleep(self.timeout)
       print "Sleeping for " + str(self.timeout)
+      self.reset_ws()
 
-
+  def reset_ws(self):
+    self.ws = websocket.WebSocketApp(self.ws_url,
+      on_message = self.on_message,
+      on_error = self.on_error,
+      on_close = self.on_close,
+      on_open = self.on_open)
 
   def register_callback(self):
     self.ws.send(self.register_message())
@@ -164,6 +182,14 @@ class BoardSetup():
   def greeting(self, channel_name):
     regards = {
       'command': 'subscribe',
+      'identifier': json.dumps(self.get_identifier(channel_name))
+    }
+
+    return json.dumps(regards)
+
+  def unsubscribe(self, channel_name):
+    regards = {
+      'command': 'unsubscribe',
       'identifier': json.dumps(self.get_identifier(channel_name))
     }
 

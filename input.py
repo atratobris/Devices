@@ -56,12 +56,15 @@ def ws_message(data_input, channel_name):
 def greet(ws):
   ws.send(greetings(CHANNEL))
 
-def on_open_callback(ws):
-  while True:
-    response = driver.get()
+def on_open_callback(ws, check_socket_running):
+  socket_running = check_socket_running()
+  while socket_running:
+    response = False
     if response:
       driver.reset()
       button_handler(response, ws)
+    socket_running = check_socket_running()
+  print "Exiting"
 
 if __name__ == '__main__':
 
