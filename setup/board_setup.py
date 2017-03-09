@@ -71,8 +71,8 @@ class BoardSetup():
         pass
       elif register_status == 'pending':
         self.pending = True
+        self.driver.register_pending()
       else:
-
         self.pending = False
         self.registered = True
     if message_type == "deregister_board":
@@ -97,7 +97,6 @@ class BoardSetup():
       while not self.is_registered():
         if self.is_pending():
           print 'Pending'
-          self.driver.register_pending()
           registered_pressed = self.driver.read_register_status()
           if registered_pressed:
             self.register_callback()
