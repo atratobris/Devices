@@ -17,10 +17,6 @@ driver = Driver()
 
 DEFAULT_MAC = "56:78"
 
-if Config.embedded():
-    from bridgeclient import BridgeClient as bridgeclient
-    b_client = bridgeclient()
-
 
 def on_sketch_message(ws, message):
   # transform string to json

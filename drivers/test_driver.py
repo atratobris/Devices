@@ -7,10 +7,11 @@ class TestInputDriver(DriverInterface):
     self.pending_for = 0
 
   def register_pending(self):
-    self.pending_for += 1
-    time.sleep(2)
+    pass
 
   def read_register_status(self):
+    self.pending_for += 1
+    time.sleep(2)
     if self.pending_for == 3:
       self.pending_for = 0
       return True

@@ -75,7 +75,7 @@ class BoardSetup():
       else:
         self.pending = False
         self.registered = True
-    if message_type == "deregister_board":
+    elif message_type == "deregister_board":
       self.ws.close()
     else:
       print message
