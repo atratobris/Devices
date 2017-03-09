@@ -34,7 +34,7 @@ class Driver(DriverInterface):
   def get(self, input_pin=None):
     if not input_pin:
       input_pin = self.buttonPin
-    prev_input = self.input[input_pin]
+    prev_input = self.input.get(input_pin, None)
     self.input[input_pin] = GPIO.input(self.buttonPin)
     if ((not prev_input) and self.input[input_pin]):
       return True
