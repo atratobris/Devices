@@ -63,10 +63,10 @@ class BoardSetup():
   def _on_register_message(self, ws, message):
     message_object = message.get("message", {})
     message_type = message_object.get("type", "unknown")
+    board = message_object.get("board", {})
+    if board.get('mac', '') != self.mac:
+      return
     if message_type == "board_details":
-      board = message_object.get("board", {})
-      if board.get('mac', '') != self.mac:
-        return
       register_status = board.get("register_status", 'unregistered')
       if register_status == 'unregistered':
         pass
