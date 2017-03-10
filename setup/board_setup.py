@@ -108,7 +108,7 @@ class BoardSetup():
           if registered_pressed:
             self.register_callback()
         else:
-          print 'Unregistered'
+          print "Unregistered %s" % self.mac
           time.sleep(2)
       print 'Registered'
       ws.send(self.greeting(SKETCH_CHANNEL))
