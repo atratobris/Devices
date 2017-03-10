@@ -3,14 +3,24 @@
 #define led 2
 #define led2 13
 
+#define pendingLED 6
+#define pendingButton 3
+
 #include <Bridge.h>
+
+char pending[10];
 
 void setup() {
   Serial.begin (9600);
+
+  memset(pending, 0, 10);
+  
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
   pinMode(led, OUTPUT);
   pinMode(led2, OUTPUT);
+
+  pinMode(pendingLED, OUTPUT);
 
   Bridge.begin();
 
@@ -19,6 +29,23 @@ void setup() {
 
 void loop() {
   long duration, distance;
+
+  int triggered;
+
+  Bridge.get("pending", pending, 10);
+
+  while (0 == strcmp(pending, "true")) {
+    triggered = loop_iteration("BP");
+    Bridge.put("pending", "false");
+  }
+  
+  triggered = loop_iteration("BP");
+}
+
+int loop_iteration(String channel) {
+  long duration, distance;
+  int triggered = 0;
+
   digitalWrite(trigPin, LOW);  // Added this line
   delayMicroseconds(2); // Added this line
   digitalWrite(trigPin, HIGH);
@@ -29,8 +56,10 @@ void loop() {
   distance = (duration/2) / 29.1;
   if (distance < 10) {  // This is where the LED On/Off happens
     digitalWrite(led,HIGH); // When the Red condition is met, the Green LED should turn off
-    Bridge.put("BP", "true");
+    Bridge.put(channel, "true");
     digitalWrite(led2,LOW);
+    triggered = 1;
+    delay(1000);
   }
   else {
     digitalWrite(led,LOW);
@@ -43,7 +72,7 @@ void loop() {
     Serial.print(distance);
     Serial.println(" cm");
   }
-  delay(500);
+  return triggered;
 }
 
 void blinkTwice() {

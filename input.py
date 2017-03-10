@@ -59,7 +59,7 @@ def greet(ws):
 def on_open_callback(ws, check_socket_running):
   socket_running = check_socket_running()
   while socket_running:
-    response = False
+    response = driver.get()
     if response:
       driver.reset()
       button_handler(response, ws)

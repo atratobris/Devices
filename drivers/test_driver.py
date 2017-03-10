@@ -21,7 +21,7 @@ class TestInputDriver(DriverInterface):
     # print "Sim the press of a button: "
     # msg = sys.stdin.readline()
     msg = raw_input("Sim the press of a button: ")
-    # return True
+    return True
 
 
   def reset(self):
