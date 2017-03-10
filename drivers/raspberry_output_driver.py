@@ -12,13 +12,13 @@ class Driver(DriverInterface):
     self.ledPin = 18
     self.registerPin = 20
 
-    self.registerPin = self.ledPin #modify later to use different button
+    # self.registerPin = self.ledPin #modify later to use different button
     self.pendingPin = 17
 
     GPIO.setmode(GPIO.BCM)
 
     GPIO.setup(self.ledPin, GPIO.OUT)
-    GPIO.setup(self.registerPin, GPIO.IN)
+    # GPIO.setup(self.registerPin, GPIO.IN)
     GPIO.setup(self.pendingPin, GPIO.OUT, initial=0)
 
   def register_pending(self):
