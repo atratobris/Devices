@@ -2,15 +2,22 @@ import sys
 from driver_interface import DriverInterface
 from phue import Bridge
 
+
 class Driver(DriverInterface):
   def __init__(self):
     self.input = {}
     self.register_input = None
     self.registerPin = 20
     self.pendingPin = 17
-    self.b = Bridge('192.168.0.148')
+    self.b = Bridge('192.168.1.100')
     self.b.connect()
-    self.b.get_api()
+    while True:
+        try:
+            self.b.get_api()
+            break
+        except:
+            print "Could not get_api"
+
     print self.b
 
   def register_pending(self):
@@ -23,11 +30,12 @@ class Driver(DriverInterface):
       GPIO.output(self.pendingPin, 0)
     return button_pressed
 
+  def set_lights(self, on):
+    for l in self.b.lights:
+        l.on = on
+
   def set(self, data):
-    if bool(data['13']):
-        self.b.set_light(3, 'bri', 255)
-    else:
-        self.b.set_light(3, 'bri', 1)
+      self.set_lights( bool(data['13']) )
 
   def get(self, input_pin=None):
     if not input_pin:

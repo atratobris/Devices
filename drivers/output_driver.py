@@ -24,10 +24,3 @@ class Driver(DriverInterface):
       self.b_client.put("D13", str(int(bool(data['13']))))
     else:
       pass
-
-
-# LED
-#     b_client.put("OUTPUT_CHANNEL", str(int(bool(data))))
-
-# LCD
-#     b_client.put("OUTPUT_CHANNEL", data['value'])
