@@ -25,7 +25,11 @@ void setup() {
 
   digitalWrite(pendingLED, LOW);
 
+  Serial.println("Starting");
+
   Bridge.begin();
+
+  Serial.println("Started");
 
   blinkTwice();
 }

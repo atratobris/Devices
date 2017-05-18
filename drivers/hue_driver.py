@@ -21,7 +21,7 @@ class Driver(DriverInterface):
     print self.b
 
   def register_pending(self):
-    self.b.set_light(3, 'bri', 255)
+    self.set_lights(True)
 
   def read_register_status(self):
     return True
@@ -47,4 +47,4 @@ class Driver(DriverInterface):
     return False
 
   def reset(self):
-    pass
+    self.set_lights(False)

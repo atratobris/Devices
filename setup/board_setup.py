@@ -107,6 +107,7 @@ class BoardSetup():
           registered_pressed = self.driver.read_register_status()
           if registered_pressed:
             self.register_callback()
+            print "Register Pressed"
             time.sleep(2)
         else:
           print "Unregistered %s" % self.mac
